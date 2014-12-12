@@ -1,0 +1,19 @@
+<div id="head">
+    <center>
+	<div id="headmenu">
+	    <img id="logo" src="./../img/logo-white.png">
+	    <div id="services">
+		<a href="job.php">Вакансии</a>
+		<a href="staff.php">Персонал</a>
+		<a href="traning.php">Тренинги</a>
+		<a href="freelance.php">Фриланс</a>
+		<a href="about.php">О компании</a>
+		<a href="contacts.php">Контакты</a>
+	    </div>
+	    <div id="loginarea">
+		<a href="register.php">Регистрация</a>
+		<a href="login.php">Войти</a>
+	    </div>
+	</div>
+    </center>
+</div>

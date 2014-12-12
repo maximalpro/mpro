@@ -1,0 +1,282 @@
+<h1>Создание и настройка выделенного сервера AWS EC2 (Apache+Nginx, eAccelerator, memcached)</h1>
+
+
+<h3>Перед созданием сервера сначала зарегистрируемся в AWS:</h3>
+1) Указываем свои реквизиты и реквизиты своей банковской карты<br>
+2) Активируем свой аккаунт по телефону<br>
+3) Ждём активации модератором (от 5 минут до пары дней)
+
+<h3>Создаём политику безопасности</h3>
+После активации аккаунта создаём группу безопасности (политику).<br>
+Назовём её <b>web</b>, и добавим несколько правил, для общего доступа к серверу (Source: 0.0.0.0/0), к портам 20-21, TCP порты 1024-1048, HTTP и HTTPS. <br>
+Разрешать доступ по SSH с любого адреса я бы не советовал, но не у всех есть статический IP, поэтому лучше вписать в строку Source: или свой статический IP или подсеть своего провайдера (что-нибудь типа 211.207.171.0/24).<br>
+В результате должно получится что-то похожее.
+
+<center><img src="http://maximal.pro/imgs/tips/awsec23.png" alt="настройка AWS EC2 сервера" width="600"></center>
+
+<h3>Создаём SSH ключи</h3>
+Ключи нужны для доступа на сервер по SSH и они могут быть созданы и в процессе развертывания образа выбранной ОС, но в IE и Chrome наблюдаются периодические глюки с отдачей файла ключей на скачивание. Поэтому лучше сделать это заранее и если заглючит, то повторить.<br>
+Для генерации ключей выбираем Key Pairs в меню и давим пару кнопок.<br>
+
+<center><img src="http://maximal.pro/imgs/tips/awsec24.png" alt="настройка AWS EC2 сервера"></center>
+
+Сервер немного подумает и отдаст нам ключевой .pem файл, который нужно бережно спрятать в надежном месте и никому не показывать.
+
+<h3>Развертывание образа Операционной Системы.</h3>
+Кликаем на Launch Instance из меню EC2 Dashboard.<br>
+Выбираем нужную ОС - я обычно беру Ubuntu (тот же Debian, только софт поновее и больше его).<br>
+Клацаем по возможности Next, выбирая по пути пару ключей, которые создали ранее, и политику безопасности web, которую мы настроли ранее.<br>
+Рекомендую также включить защиту от удаления ("Terminate protection"), так как она меня не раз спасала.
+
+<h3>Регистрируем IP адрес для сервера</h3>
+В меню Elastic IPs сначала резервируем себе IP адрес и присваиваем его нашему запущенному серверу.
+
+<h2>Настраиваем софт на сервере</h2>
+Подключаемся через Putty к нашему серверу, с помощью сертификата, в качестве логина вводим <b>ubuntu</b>.<br>
+
+Перелазим в суперпользователя
+
+<pre><code>$su</code></pre>
+
+Обновляем репозиторий
+
+<pre><code>#apt-get update && apt-get upgrade</code></pre>
+
+Ставим всё необходимое кроме MySQL сервера, так как лучше использовать выделенный RDS сервер с мускулом от амазона (быстрее и надёжней)
+
+<pre><code>#apt-get install apache2 php5 php5-mysql 
+#apt-get install nginx 
+#apt-get install libapache2-mod-rpaf</code></pre>
+
+Вешаем апач на другой порт, например 81 (можете на 8080, не суть важно):
+
+<pre><code>#nano /etc/apache2/ports.conf</code></pre>
+
+В файле меняем порт
+
+<pre><code>Listen *:81</code></pre>
+
+Далее настраиваем виртуальный хост apache.<br>
+Копируем дефолтный конфиг:
+
+<pre><code>#cd /etc/apache2/sites-available
+#cp ./default /etc/apache2/sites-enabled/example.com</code></pre>
+
+Редактируем конфиг виртуалхоста апача:
+
+<pre><code>#nano /etc/apache2/sites-enabled/example.com</code></pre>
+
+Должно выйти следующее
+
+<pre><code><VirtualHost *:81>
+ServerName www.example.com
+ServerAlias example.com
+ServerAdmin webmaster@example.com
+
+DocumentRoot /var/www/example.com
+<Directory /var/www/example.com>
+Options Indexes FollowSymLinks MultiViews
+AllowOverride All
+Order allow,deny
+allow from all
+</Directory>
+
+ErrorLog /var/log/apache2/error.log
+
+LogLevel warn
+
+ServerSignature On
+
+</VirtualHost></code></pre>
+
+Настраиваем gzip сжатие для nginx. Открываем конфиг:
+<pre><code>#nano /usr/local/etc/nginx/nginx.conf</code></pre>
+
+Мой конфиг выглядит так:
+<pre><code>user www-data;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    server_names_hash_bucket_size 64;
+    access_log  /var/log/nginx/access.log;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    tcp_nodelay        on;
+
+
+    #Включить сжатие
+    gzip                on;
+    #Разрешить сжатие для всех проксированных запросов 
+    gzip_proxied        any;
+    gzip_min_length     1100;
+    gzip_http_version   1.0;
+    gzip_buffers        4 8k;
+
+    # Уровень gzip-компрессии (у меня 9, т.е. максимальное сжатие, т.к. ресурсы позволяют)
+    gzip_comp_level     9;
+
+    # MIME-типы которые необходимо жать
+    gzip_types          text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}</code></pre>
+
+Для виртуалхоста создаем новый конфиг:
+<pre><code>#nano /etc/nginx/sites-enabled/example.com</code></pre>
+
+Содержание конфига
+<pre><code>server {
+listen 80;
+server_name example.com;
+
+access_log /var/log/nginx/example.com-nginx.access.log;
+
+location / {
+proxy_pass http://127.0.0.1:81/;
+proxy_redirect off;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+client_max_body_size 40m;
+client_body_buffer_size 256k;
+
+proxy_connect_timeout 120;
+proxy_send_timeout 120;
+proxy_read_timeout 120;
+
+proxy_buffer_size 64k;
+proxy_buffers 4 64k;
+proxy_busy_buffers_size 64k;
+proxy_temp_file_write_size 64k;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+#Static files location
+location ~* ^.+.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|txt|tar|mid|midi|wav|bmp|rtf|js|html|flv|mp3)$ {
+root /var/www/example.com; }
+
+} </code></pre>
+
+Проверяем конфиг nginx:
+
+<pre><code># nginx -t</code></pre>
+
+Устанавливаем memcached:
+
+<pre><code>#apt-get install memcached php5-memcached</code></pre>
+
+
+Конфигурация memcached находится по адресу /etc/php5/conf.d/memcache.ini<br>
+По началу ничего менять не стоит.<br>
+<br>
+Устанавливаем eAccelerator.<br>
+Так же тянем php5-dev, т.к. нам понадобится утилита phpize.
+
+<pre><code>#apt-get install php5-dev 
+#apt-get install make
+#cd /tmp/ 
+#wget http://bart.eaccelerator.net/source/0.9.5.3/eaccelerator-0.9.5.3.tar.bz2 
+#tar xvjf eaccelerator-0.9.5.3.tar.bz2 
+#cd eaccelerator-0.9.5.3 
+#phpize 
+#./configure --enable-eaccelerator=shared 
+#make 
+#make install</code></pre>
+
+
+Создаем папку кеша:
+
+<pre><code>#mkdir -p /var/cache/eaccelerator 
+#chmod 0777 /var/cache/eaccelerator</code></pre>
+
+
+Редактируем конфиг PHP:
+
+<pre><code>#nano /etc/php5/apache2/php.ini</code></pre>
+
+
+Добавляем строки в самом верху:
+
+<pre><code>[PHP]
+
+; eAccelerator configuration
+; Note that eAccelerator may also be installed as a PHP extension or as a zend_extension
+; If you are using a thread safe build of PHP you must use
+; zend_extension_ts instead of zend_extension
+extension                       = "eaccelerator.so"
+eaccelerator.shm_size           = "16"
+eaccelerator.cache_dir          = "/var/cache/eaccelerator"
+eaccelerator.enable             = "1"
+eaccelerator.optimizer          = "1"
+eaccelerator.check_mtime        = "1"
+eaccelerator.debug              = "0"
+eaccelerator.filter             = ""
+eaccelerator.shm_max            = "0"
+eaccelerator.shm_ttl            = "0"
+eaccelerator.shm_prune_period   = "0"
+eaccelerator.shm_only           = "0"
+eaccelerator.compress           = "1"
+eaccelerator.compress_level     = "9"
+eaccelerator.allowed_admin_path = "/var/www/eaccelerator"</code></pre>
+
+
+Внимание!<br>
+Если у вас достаточно свободной оперативной памяти, то рекомендую включить режим кэширования байт-кода исключительно в оперативной памяти:
+<pre><code>eaccelerator.shm_only           = "1"</code></pre>
+
+
+А так же увеличить доступную память для кеша:
+
+<pre><code>eaccelerator.shm_size           = "128"</code></pre>
+
+Так же в пакете аксселлератора есть файл control.php, которым вы можете управлять кешем и анализировать ошибки, что очень удобно. Класть этот файл нужно обязательно по пути
+
+<pre><code>eaccelerator.allowed_admin_path = "/var/www/eaccelerator"</code></pre>
+
+Иначе будет выдавать ошибки.<br>
+<br>
+Перезапускаем сервисы:
+
+<pre><code># service apache2 restart
+# service nginx restart
+# service memcached restart</code></pre>
+
+На сим всё должно работать.<br>
+Проверяем в phpinfo()<br>
+В хеадере eAccelerator:
+
+<pre><code>This program makes use of the Zend Scripting Language Engine:
+Zend Engine v2.2.0, Copyright © 1998-2008 Zend Technologies
+with eAccelerator v0.9.5.3, Copyright © 2004-2006 eAccelerator, by eAccelerator</code></pre>
+
+И ниже
+
+<pre><code>memcache support enabled</code></pre>
+
+Проверяем работоспособность портов (PID и DEVICE конечно же могут быть другими):
+
+<pre><code>#lsof -i</code></pre>
+
+Мы должны видеть ниже строки:
+
+<pre><code>apache2     948 www-data    3u  IPv4  47935       TCP *:81 (LISTEN)
+memcached  3096   nobody    3u  IPv4 165608       TCP localhost:11211 (LISTEN)
+nginx     19605 www-data    6u  IPv4  62263       TCP *:www (LISTEN)</code></pre>
+
+Если таковые имеются, то сервер работает как задумывалось.
+
+<br><br><br>

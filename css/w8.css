@@ -1,0 +1,369 @@
+body{
+    font: 14px Arial;
+    padding: 0px;
+    margin: 0px;
+    background-image: url("./../img/bg.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+#mainpage{
+    padding-top: 42px;
+    width: 950px;
+}
+#head{
+    position: fixed;
+    top: 0px;
+    background-color: black;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    color: white;
+    height: 40px;
+    border-bottom: 1px solid gray;
+    z-index: 9990;
+    opacity: 1;
+}
+
+#head #headmenu{
+    width: 950px;
+    position: relative;
+}
+#head #logo{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 150px;
+    height: 40px;
+}
+#head #services{
+    position: absolute;
+    left: 150px;
+    top: 0px;
+    width: 700px;
+    height: 40px;
+}
+#head #loginarea{
+    position: absolute;
+    left: 850px;
+    text-align: right;
+    top: 0px;
+    width: 100px;
+    height: 40px;
+}
+#head a{
+    padding: 10px;
+    font: 14px Arial;
+    line-height: 40px;
+    opacity: 0.8;
+    cursor: pointer;
+}
+#head a:hover{
+    opacity: 1;
+}
+#services a{
+    color: orange;
+    text-decoration: none;
+}
+#loginarea a{
+    text-decoration: none;
+    color: white;
+}
+
+#bigb{
+    width: 955px;
+    height: 200px;
+    background-color: #ffffcc;
+}
+
+td.back{
+    vertical-align: top;
+    width: 60px;
+}
+
+td.back a{
+    display: block;
+    background-color: white;
+    background-image: url("./../img/arrow_back_30.png");
+    background-position: left;
+    background-repeat: no-repeat;
+    border: 10px solid white;
+    opacity: 0.7;
+    padding: 10px;
+    padding-left: 35px;
+    height: 20px;
+    width: 40px;
+    color: #474747;
+    font: bold 16px Arial;
+    text-decoration: none;
+}
+td.back a:hover{
+    opacity: 1;
+}
+td.content{
+    padding: 15px;
+    background-color: white;
+    font: 14px Arial;
+    text-align: justify;
+}
+
+a.sendcvnow{
+    display: inline-block;
+    background-color: #159403;
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    font: 17px Arial;
+    opacity: 0.8;
+}
+a.sendcvnow:hover{
+    opacity: 1;
+}
+
+td.startmenuplane{
+    font: 13px Arial;
+    vertical-align: top;
+    background-color: #3391be;
+    width: 300px;
+    height: 180px;
+    padding: 8px;
+    color: white;
+    opacity: 0.7;
+    cursor: pointer;
+    transition-duration: 1s;
+    text-align: justify;
+}
+td.startmenuplane:hover{
+    opacity: 1;
+}
+td.startmenuplane2{
+    background-color: #159403;
+}
+td.startmenuplane3{
+    background-color: #ff6600;
+}
+
+#job{
+    background-color: #3391be;
+}
+#staff{
+    background-color: #336dbe;
+}
+#invest{
+    background-color: #3349be;
+}
+#traning{
+    background-color: #336dbe;
+}
+#freelance{
+    background-color: #3349be;
+}
+#searchjob{
+/*    background-image: url("./../img/searchjob.jpg");
+    background-position: center bottom;
+    background-repeat: no-repeat;
+*/    vertical-align: bottom;
+}
+#categories td{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font: bold 17px Arial;
+}
+#footer{
+    width: 955px;
+    height: 35px;
+    background-color: #dbdbdb;
+    color: white;
+    font: 13px Arial;
+    text-align: center;
+}
+#footer td{
+    font: 13px Arial;
+}
+#footer table{
+    height: 35px;
+}
+#footer #footertext{
+    width: 100%;
+}
+#footer #footerversions td{
+    padding-left: 10px;
+}
+
+img.uafooterlogo{
+    height: 32px;
+    margin-top: -8px;
+}
+
+td.pagetextarea{
+    text-align: justify;
+    background-color: white;
+    padding: 0px;
+    font: 16px Calibri;
+}
+td.pagetextarea p{
+    padding: 30px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-indent: 25px;
+    margin: 0px;
+}
+h3{
+    padding: 10px;
+    padding-left: 30px;
+    margin: 0px;
+}
+h3.listhed{
+    display: block;
+    padding: 10px;
+    padding-left: 30px;
+    margin: 0px;
+}
+td.pagetextarea ul, td.pagetextarea ol{
+    display: block;
+    padding: 10px;
+    padding-left: 80px;
+    margin: 0px;
+    margin-bottom: 15px;
+} 
+h3.green{
+    background-color: #d8ff9c;
+    color: black;
+}
+td.pagetextarea ul.green, td.pagetextarea ol.green{
+    background-color: #e6ffbf;
+} 
+h3.orange{
+    background-color: #ffe29c;
+    color: black;
+}
+td.pagetextarea ul.orange, td.pagetextarea ol.orange{
+    background-color: #fff3d5;
+} 
+h2.colora{
+    background-color: #e3e3e3;
+    color: black;
+    display: block;
+    padding: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0px;
+    margin-top: 10px;
+}
+h3.colora{
+    background-color: #e3e3e3;
+    color: black;
+    display: block;
+    padding: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0px;
+    margin-top: 10px;
+}
+h1.colora{
+    background-color: #ededed;
+    color: black;
+    display: block;
+    padding: 20px;
+    margin: 0px;
+}
+h1.colorq{
+    background-color: #474747;
+    color: white;
+    display: block;
+    padding: 10px;
+    padding-left: 20px;
+    margin: 0px;
+    font-size: 19px !important;
+}
+sup{
+    font-size: 10px;
+    color: #474747;
+}
+
+ul.vacancys li{
+    line-height: 30px;
+}
+
+a.button_regnow{
+    display: inline-block;
+    padding: 15px;
+    background-color: #cc0000;
+    color: white;
+    text-decoration: none;
+    opacity: 1;
+    font: bold 14px Arial;
+    cursor: pointer;
+    border: 1px solid #ff6600;
+}
+a.button_gray{
+    display: inline-block;
+    padding: 15px;
+    background-color: #5f5f5f;
+    color: white;
+    text-decoration: none;
+    opacity: 1;
+    font: bold 14px Arial;
+    cursor: pointer;
+    border: 1px solid #dbdbdb;
+}
+a.button_regnow:hover, a.button_gray:hover{
+    opacity: 0.8;
+}
+
+a.bb_bb{
+    display: block;
+    width: 955px;
+    height: 300px;
+    background-color: black;
+}
+
+quote{
+    display: block;
+    font: italic 15px TimesNewRoman;
+    background-color: #eaeaff;
+    color: #5f5f5f;
+    padding: 40px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin: 0px;
+    
+}
+li.level1{
+    margin-top: 10px;
+}
+li.level2{
+    margin-left: 20px;
+}
+div.textloginarea_error{
+    color: red;
+    font-weight: bold;
+    display: none;
+}
+div.textloginarea{
+    background-image: url('./../img/login.png'); 
+    background-position: right bottom; 
+    background-repeat: no-repeat; 
+    height: 280px;
+    padding: 40px;
+    padding-right: 450px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+div.textloginarea input{
+    border: 1px solid Gray;
+    font: 20px Arial;
+    padding: 10px;
+    border-radius: 2px;
+    width: 360px;
+}
+
+div.textloginarea button{
+    border: 1px solid Gray;
+    font: 20px Arial;
+    padding: 10px;
+    border-radius: 2px;
+    width: 180px;
+}
