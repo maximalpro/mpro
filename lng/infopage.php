@@ -1,6 +1,12 @@
 <?php
     session_start();
 
+//распознавание параметров ЧПУ
+//пока влом доделать
+
+    if(isset($GET['lang'])) $lang=$GET['lang'];
+    if(isset($GET['infopage'])) $infopage=$GET['infopage'];
+
     if(!isset($lang)) $lang='ru';
     if(!isset($infopage))
     {
