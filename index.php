@@ -1,5 +1,4 @@
 <?php
-//пора переделывать под mvc...
     session_start();
     
     if(!isset($lang)) $lang='ru';
